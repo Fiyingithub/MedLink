@@ -1,0 +1,14 @@
+{
+    "development": {
+      "API_BASE_URL": "https://raas-backend.onrender.com/api",
+      "OTHER_CONFIG": "defaultDevValue"
+    },
+    "production": {
+      "API_BASE_URL": "https://raas-backend.onrender.com/api",
+      "OTHER_CONFIG": "defaultProdValue"
+    },
+    "test": {
+      "API_BASE_URL": "https://raas-backend.onrender.com/api",
+      "OTHER_CONFIG": "defaultTestValue"
+    }
+  }

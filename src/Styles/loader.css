@@ -1,0 +1,22 @@
+/* HTML: <div class="loader"></div> */
+.loader {
+    width: fit-content;
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 2.5vw;
+    background: radial-gradient(circle closest-side,#B580D1 94%,#0000) right/calc(200% - 1em) 100%;
+    animation: l24 1s infinite alternate linear;
+  }
+  .loader::before {
+    content: "Click on take survey...";
+    line-height: 1em;
+    color: #0000;
+    background: inherit;
+    background-image: radial-gradient(circle closest-side,#fff 94%,#73597b);
+    -webkit-background-clip:text;
+            background-clip:text;
+  }
+  
+  @keyframes l24{
+    100%{background-position: left}
+  }
