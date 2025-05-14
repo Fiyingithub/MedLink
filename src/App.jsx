@@ -3,7 +3,7 @@ import HomePage from "./pages/HomePage";
 import NotFound from "./pages/NotFound";
 import Signup from "./pages/Auth/Signup";
 import Login from "./pages/Auth/Login";
-import ResetPassword from "./pages/ResetPassword.jsx";
+import ResetPassword from "./pages/Auth/ResetPassword.jsx";
 
 
 const App = () => {
@@ -16,7 +16,7 @@ const App = () => {
         {/* Auth */}
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
       </Routes>
     </div>
