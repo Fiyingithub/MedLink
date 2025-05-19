@@ -4,7 +4,7 @@ import API from "../../api/Axios"; // Adjust the import path as needed
 
 const ResetPassword = () => {
   const { token } = useParams();
-  const [email, setEmail] = useState("");
+  // const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -23,8 +23,7 @@ const ResetPassword = () => {
 
     try {
       setLoading(true);
-      const response = await API.post(`/reset-password/${token}`, {
-        email,
+      const response = await API.post(`/resetPassword/reset-password/${token}`, {
         newPassword,
       });
 
@@ -51,14 +50,14 @@ const ResetPassword = () => {
           strong password to keep your account secure.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
+          {/* <input
             type="email"
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             className="w-full pl-10 p-2 border border-gray-300 rounded-md focus:ring focus:ring-[#00418C] focus:outline-none"
-          />
+          /> */}
           <input
             type="password"
             placeholder="New Password"

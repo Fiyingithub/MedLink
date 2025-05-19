@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { UserRound, Stethoscope, LogIn, Lock } from "lucide-react";
 import Logo from "../../assets/images/assets";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import API from "../../api/axios";
 
 const Login = () => {
   const [userType, setUserType] = useState("patient");
@@ -10,6 +11,9 @@ const Login = () => {
     password: "",
     rememberMe: false,
   });
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -19,12 +23,35 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(
-      `${userType.charAt(0).toUpperCase() + userType.slice(1)} login attempted!`
-    );
-    console.log(formData);
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      const res = await API.post("/user/login", {
+        ...formData,
+        role: userType,
+      });
+
+      // Example: store token/user and navigate
+      localStorage.setItem("user", JSON.stringify(res.data));
+      alert("Login successful!");
+
+      // Redirect based on role
+      if (userType === "patient") {
+        navigate("/patient-dashboard");
+      } else {
+        navigate("/doctor-dashboard");
+      }
+    } catch (err) {
+      const msg =
+        err.response?.data?.message || "Login failed. Please try again.";
+      setErrorMsg(msg);
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loginParagraph =
@@ -34,16 +61,14 @@ const Login = () => {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gray-100 overflow-hidden">
-      {/* Dark overlay */}
       <div className="hidden lg:block absolute inset-0 bg-black opacity-10 z-10" />
 
-      {/* Content */}
       <form
         onSubmit={handleSubmit}
         className="relative z-50 w-full max-w-xl bg-white bg-opacity-95 rounded-lg shadow-xl lg:p-8 p-4 pb-20 lg:m-4"
       >
         <div>
-          <img src={Logo} alt="" />
+          <img src={Logo} alt="Logo" />
         </div>
         <h1 className="text-2xl font-bold text-center mb-2 text-[#00418C]">
           Login
@@ -75,9 +100,15 @@ const Login = () => {
           </div>
         </div>
 
+        {/* Error Message */}
+        {errorMsg && (
+          <div className="text-red-600 text-sm text-center mb-4">
+            {errorMsg}
+          </div>
+        )}
+
         {/* Form Fields */}
         <div className="space-y-6">
-          {/* Email Field */}
           <div>
             <label
               className="block text-[15px] font-medium text-gray-700 mb-1"
@@ -95,13 +126,13 @@ const Login = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                required
                 className="w-full pl-10 p-2 border border-gray-300 rounded-md focus:ring focus:ring-[#00418C] focus:outline-none"
-                placeholder={`Enter Email Address`}
+                placeholder="Enter Email Address"
               />
             </div>
           </div>
 
-          {/* Password Field */}
           <div>
             <label
               className="block text-[15px] font-medium text-gray-700 mb-1"
@@ -119,13 +150,13 @@ const Login = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
+                required
                 className="w-full pl-10 p-2 border border-gray-300 rounded-md focus:ring focus:ring-[#00418C] focus:outline-none"
                 placeholder="••••••••"
               />
             </div>
           </div>
 
-          {/* Remember Me and Forgot Password */}
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
@@ -143,31 +174,34 @@ const Login = () => {
                 Remember me
               </label>
             </div>
-            <Link to={'/forgot-password'} className="text-sm text-blue-600 hover:underline">
+            <Link
+              to={"/forgot-password"}
+              className="text-sm text-blue-600 hover:underline"
+            >
               Forgot password?
             </Link>
           </div>
 
-          {/* Login Button */}
           <button
             type="submit"
-            className="w-full bg-[#00418C] text-white py-3 rounded-md hover:bg-[#00418C]/90 transition"
+            disabled={loading}
+            className={`w-full bg-[#00418C] text-white py-3 rounded-md transition ${
+              loading ? "opacity-70 cursor-not-allowed" : "hover:bg-[#00418C]/90"
+            }`}
           >
-            login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           <div className="text-center text-[18px] mt-4 text-gray-600">
             Don't have an account?{" "}
             <Link
               to={"/signup"}
-              href="#"
-              className="text-[#00418C] font-medium mt-8 hover:underline"
+              className="text-[#00418C] font-medium hover:underline"
             >
               Signup
             </Link>
           </div>
 
-          {/* Portal Info (Conditional based on user type) */}
           <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
             <h3 className="text-sm font-medium text-blue-800">
               {userType === "patient"

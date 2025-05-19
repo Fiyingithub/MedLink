@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Check, UserRound, Stethoscope, ChevronDown } from "lucide-react";
 import Logo from "../../assets/images/assets";
 import { Link } from "react-router-dom";
+import API from "../../api/axios";
 
 const Signup = () => {
   const [userType, setUserType] = useState("patient");
+  const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -29,27 +31,64 @@ const Signup = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.termsAgreed) {
       alert("You must agree to the terms and conditions.");
       return;
     }
 
-    alert(
-      `${
-        userType.charAt(0).toUpperCase() + userType.slice(1)
-      } registration submitted!`
-    );
-    console.log(formData);
+    try {
+      const data = new FormData();
+
+      // Universal required fields
+      data.append("role", userType); // backend expects 'role'
+      data.append("firstName", formData.firstName);
+      data.append("lastName", formData.lastName);
+      data.append("email", formData.email);
+      data.append("password", formData.password);
+      data.append("confirmPassword", formData.confirmPassword);
+      data.append("dateOfBirth", formData.dateOfBirth);
+
+      if (userType === "patient") {
+        data.append("bloodType", formData.bloodType);
+        data.append("allergies", formData.allergies);
+      } else if (userType === "doctor") {
+        data.append("specialization", formData.specialization);
+        data.append("licenseNumber", formData.licenseNumber);
+        data.append("yearsOfExperience", formData.yearsOfExperience.toString());
+        data.append("hospital", formData.hospital);
+      }
+
+      if (image) {
+        data.append("image", image); // image last
+      }
+
+      const response = await API.post("/user/register", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (response.status === 200) {
+        alert("Registration successful!");
+        console.log("Server response:", response.data);
+        //  navigate('/doctor-dashboard');
+      } else {
+        alert(response.data.message || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("Network error. Please try again later.");
+    }
   };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gray-100 overflow-hidden">
-      {/* Dark overlay */}
       <div className="hidden lg:block absolute inset-0 bg-black opacity-10 z-10" />
-
-      {/* Content */}
       <form
         onSubmit={handleSubmit}
         className="relative z-50 w-full max-w-xl bg-white bg-opacity-95 rounded-lg shadow-xl lg:p-8 p-4 pb-20 lg:m-4"
@@ -88,7 +127,6 @@ const Signup = () => {
 
         {/* Form Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Common Fields */}
           {[
             { label: "First Name", name: "firstName" },
             { label: "Last Name", name: "lastName" },
@@ -123,7 +161,20 @@ const Signup = () => {
             </div>
           ))}
 
-          {/* Conditional Fields */}
+          {/* Image Upload */}
+          <div className="md:col-span-2">
+            <label className="block text-[15px] font-medium text-gray-700 mb-1">
+              Upload Profile Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          {/* Patient Specific */}
           {userType === "patient" && (
             <>
               <div>
@@ -135,7 +186,7 @@ const Signup = () => {
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-[#00418C] focus:outline-none"
+                  className="w-full p-2 border border-gray-300 rounded-md"
                 />
               </div>
 
@@ -148,7 +199,7 @@ const Signup = () => {
                     name="bloodType"
                     value={formData.bloodType}
                     onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded-md appearance-none focus:ring focus:ring-[#00418C] focus:outline-none"
+                    className="w-full p-2 border border-gray-300 rounded-md appearance-none"
                   >
                     <option value="">Select</option>
                     {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(
@@ -174,13 +225,14 @@ const Signup = () => {
                   name="allergies"
                   value={formData.allergies}
                   onChange={handleChange}
-                  className="w-full p-2 text-[16px] border border-gray-300 resize-none rounded-md focus:ring focus:ring-[#00418C] focus:outline-none h-20"
+                  className="w-full p-2 h-20 border border-gray-300 resize-none rounded-md"
                   placeholder="List any allergies you have..."
                 />
               </div>
             </>
           )}
 
+          {/* Doctor Specific */}
           {userType === "doctor" && (
             <>
               {[
@@ -202,7 +254,7 @@ const Signup = () => {
                     value={formData[field.name]}
                     onChange={handleChange}
                     placeholder={`Enter ${field.name}`}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-[#00418C] focus:outline-none"
+                    className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
               ))}
@@ -216,7 +268,7 @@ const Signup = () => {
                     name="specialization"
                     value={formData.specialization}
                     onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded-md appearance-none focus:ring focus:ring-[#00418C] focus:outline-none"
+                    className="w-full p-2 border border-gray-300 rounded-md appearance-none"
                   >
                     <option value="">Select</option>
                     {[
@@ -244,7 +296,7 @@ const Signup = () => {
           )}
         </div>
 
-        {/* Terms Agreement */}
+        {/* Terms */}
         <div className="flex items-center mb-6">
           <input
             type="checkbox"
@@ -265,7 +317,6 @@ const Signup = () => {
           </label>
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="w-full bg-[#00418C] text-white py-3 rounded-md hover:bg-[#00418C]/90 transition"
@@ -277,8 +328,7 @@ const Signup = () => {
           Already have an account?{" "}
           <Link
             to={"/login"}
-            href="#"
-            className="text-[#00418C] font-medium mt-8 hover:underline"
+            className="text-[#00418C] font-medium hover:underline"
           >
             Login
           </Link>
