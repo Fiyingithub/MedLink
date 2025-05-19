@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const HomePage = () => {
   return (
@@ -14,6 +15,9 @@ const HomePage = () => {
 
       <div className="absolute inset-0 bg-white bg-opacity-30 z-10" />
       <Header />
+       <main className="relative z-20 flex flex-col justify-center h-full">
+        <Footer />
+      </main>
       </div>
   );
 };
