@@ -1,5 +1,5 @@
 import { useState } from "react";
-import API from "../../api/axios"; // Adjust path if needed
+import API from "../../api/Axios"; // Adjust path if needed
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
