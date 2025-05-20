@@ -1,8 +1,9 @@
-import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import HeroImage from "../assets/images/hero.jpg"; 
 import Hero from "../components/Hero";
+import Services from "../components/Services";
+
 
 const HomePage = () => {
   return (
@@ -20,6 +21,7 @@ const HomePage = () => {
       <Header />
       <main className="relative z-20 flex flex-col justify-center h-full">
         <Hero />
+        <Services />
         <Footer />
       </main>
     </div>
