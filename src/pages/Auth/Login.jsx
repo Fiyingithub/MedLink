@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { UserRound, Stethoscope, LogIn, Lock } from "lucide-react";
 import Logo from "../../assets/images/assets";
 import { Link, useNavigate } from "react-router-dom";
-import API from "../../api/axios";
+import API from "../../api/Axios";
 
 const Login = () => {
   const [userType, setUserType] = useState("patient");
@@ -24,35 +24,38 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg("");
+  e.preventDefault();
+  setLoading(true);
+  setErrorMsg("");
 
-    try {
-      const res = await API.post("/user/login", {
-        ...formData,
-        role: userType,
-      });
+  try {
+    const res = await API.post("/user/login", {
+      ...formData,
+      role: userType,
+    });
 
-      // Example: store token/user and navigate
-      localStorage.setItem("user", JSON.stringify(res.data));
-      alert("Login successful!");
+    // 🔐 Store token and user separately
+    const { token, user } = res.data;
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
 
-      // Redirect based on role
-      if (userType === "patient") {
-        navigate("/patient-dashboard");
-      } else {
-        navigate("/doctor-dashboard");
-      }
-    } catch (err) {
-      const msg =
-        err.response?.data?.message || "Login failed. Please try again.";
-      setErrorMsg(msg);
-      console.error("Login error:", err);
-    } finally {
-      setLoading(false);
+    alert("Login successful!");
+
+    // 🚀 Redirect based on role
+    if (userType === "patient") {
+      navigate("/book-appointment");
+    } else {
+      navigate("/doctor-dashboard");
     }
-  };
+  } catch (err) {
+    const msg =
+      err.response?.data?.message || "Login failed. Please try again.";
+    setErrorMsg(msg);
+    console.error("Login error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const loginParagraph =
     userType === "patient"
