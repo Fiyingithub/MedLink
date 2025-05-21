@@ -1,5 +1,7 @@
 import bgImage from './bgImage.png'
 import Logo from './logo.png'
+import HeroImage from './hero.jpg'
+import ResetPasswordmage from './ResetPasswordImage.jpg'
 import DentistImg from './dentist-image.png'
 import NeurologyImg from './neurology.png'
 import CardiologyImg from './cardiology.jpg'
@@ -18,7 +20,9 @@ import Tips3Img from './tips3.png'
 
 const assets = {
   bgImage,
-  Logo, 
+  Logo,
+  HeroImage,
+  ResetPasswordmage,
   DentistImg,
   NeurologyImg,
   CardiologyImg,

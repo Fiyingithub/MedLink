@@ -1,8 +1,7 @@
-
-import SearchIcon from "../assets/icons/search.svg"
+import SearchIcon from "../assets/icons/search.svg";
 
 const Header = () => (
-  <header className="relative z-20 w-full px-6 py-4 flex justify-between items-center">
+  <header className="relative z-20 w-full bg-[#9CA6AF40] px-6 py-4 flex justify-between items-center">
     {/* Logo */}
     <div className="text-3xl font-bold">
       <span className="text-black">Med</span>
@@ -11,16 +10,16 @@ const Header = () => (
 
     {/* Navigation Menu */}
     <nav className="hidden md:flex gap-8 font-medium text-black">
-      <a href="#" className="hover:text-blue-600">
+      <a href="#" className="hover:text-[#061492]">
         Home
       </a>
-      <a href="#" className="hover:text-blue-600">
+      <a href="#" className="hover:text-[#061492]">
         Service
       </a>
-      <a href="#" className="hover:text-blue-600">
+      <a href="#" className="hover:text-[#061492]">
         Blog
       </a>
-      <a href="#" className="hover:text-blue-600">
+      <a href="#" className="hover:text-[#061492]">
         Contact
       </a>
     </nav>
@@ -28,9 +27,9 @@ const Header = () => (
     {/* Action Buttons */}
     <div className="flex items-center gap-4">
       <button aria-label="Search" className="text-black text-xl">
-        <img src={SearchIcon} alt="Search" className="w-6 h-6" />
+        <img src={SearchIcon} alt="Search" className="w-6 h-6 cursor-pointer" />
       </button>
-      <button className="bg-[#061492] text-white px-6 py-2 rounded-full font-semibold">
+      <button className="bg-[#061492] hover:bg-[#061492]/90 cursor-pointer text-white px-6 py-2 rounded-full font-semibold">
         Get Started
       </button>
     </div>

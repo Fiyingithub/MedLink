@@ -1,4 +1,3 @@
-
 import {
   FaFacebookF,
   FaTwitter,
@@ -9,10 +8,10 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-[#061492] text-white px-6 py-10">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
+    <footer className="bg-[#061492] text-white px-4 lg:px-6 py-10">
+      <div className="max-w-[1200px] mx-auto flex flex-col lg:flex-row space-y-10 lg:space-y-0 justify-between">
         {/* About MedLink */}
-        <div>
+        <div className="w-full lg:w-[35%]">
           <h1 className="text-3xl font-bold">
             <span className="text-black">Med</span>
             <span className="text-red-600">Link</span>
@@ -23,19 +22,19 @@ const Footer = () => {
             access to experts <span className="underline">Doctors</span>
           </p>
           <div className="flex space-x-4 mt-4 text-xl">
-            <FaFacebookF />
-            <FaTwitter />
-            <FaInstagram />
-            <FaHeadset />
+            <FaFacebookF className="cursor-pointer hover:text-gray-400" />
+            <FaTwitter className="cursor-pointer hover:text-gray-400" />
+            <FaInstagram className="cursor-pointer hover:text-gray-400" />
+            <FaHeadset className="cursor-pointer hover:text-gray-400" />
           </div>
-          <div className="flex items-center mt-4 border rounded px-2 py-1">
-            <FaEnvelope className="mr-2 text-gray-400" />
+          <div className="w-full flex items-center mt-4 border border-gray-500 rounded px-2 py-1">
+            <FaEnvelope className="mr-2 text-gray-500" />
             <input
               type="email"
               placeholder="Enter Your Email"
-              className="bg-blue-900 text-white outline-none flex-1"
+              className="bg-blue-900 text-white bg-transparent outline-none flex-1"
             />
-            <button className="bg-white text-blue-900 px-4 py-1 rounded ml-2">
+            <button className="bg-gray-300 hover:bg-gray-200 text-[#061492] font-medium cursor-pointer px-4 py-1 rounded ml-2">
               Submit
             </button>
           </div>
@@ -79,12 +78,22 @@ const Footer = () => {
 
       {/* Footer Bottom */}
       <div className="border-t border-white/20 mt-10 pt-6 text-xs flex flex-col md:flex-row justify-between items-center">
-        <div className="flex space-x-6 mb-4 md:mb-0">
-          <a href="#">About Us</a>
-          <a href="#">Contact</a>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Sitemap</a>
-          <a href="#">Terms of Use</a>
+        <div className="flex space-x-5 lg:space-x-6 mb-4 md:mb-0">
+          <a className="hover:text-gray-400" href="#">
+            About Us
+          </a>
+          <a className="hover:text-gray-400" href="#">
+            Contact
+          </a>
+          <a className="hover:text-gray-400" href="#">
+            Privacy Policy
+          </a>
+          <a className="hover:text-gray-400" href="#">
+            Sitemap
+          </a>
+          <a className="hover:text-gray-400" href="#">
+            Terms of Use
+          </a>
         </div>
         <div className="flex items-center space-x-1">
           <span className="text-sm">© 2000 - 2025, All Right Reserved</span>

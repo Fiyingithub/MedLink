@@ -3,3 +3,7 @@
     background-color: #B580D1 !important; /* For success Employee */
     color: white !important;
   }
+.noty_type__red {
+    background-color: #f44336 !important; /* For success Employee */
+    color: white !important;
+  }
