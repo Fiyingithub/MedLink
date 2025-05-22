@@ -2,7 +2,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "http://0.0.0.0:5000/api",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
