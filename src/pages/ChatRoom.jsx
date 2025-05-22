@@ -4,16 +4,17 @@ import API from '../api/Axios';
 import { io } from 'socket.io-client';
 import { useUser } from '../context/UserContext';
 
-const socket = io('http://localhost:5000');
+const socket = io('http://localhost:5000'); // 🔁 Update to deployed URL if needed
 
 const ChatRoom = () => {
-  const { recipientId } = useParams();
   const { currentUser } = useUser();
+  const { recipientId } = useParams();
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState('');
 
   useEffect(() => {
     if (!currentUser) return;
+
     socket.emit('join', { userId: currentUser._id });
 
     socket.on('receive_message', (msg) => {
@@ -28,6 +29,8 @@ const ChatRoom = () => {
 
   useEffect(() => {
     const fetchHistory = async () => {
+      if (!currentUser) return;
+
       try {
         const res = await API.get(`/chat/${currentUser._id}/${recipientId}`);
         setMessages(res.data.messages);
@@ -35,7 +38,8 @@ const ChatRoom = () => {
         console.error("Failed to load chat history", err);
       }
     };
-    if (currentUser) fetchHistory();
+
+    fetchHistory();
   }, [recipientId, currentUser]);
 
   const sendMessage = () => {
@@ -52,7 +56,9 @@ const ChatRoom = () => {
     setNewMsg('');
   };
 
-  if (!currentUser) return <p className="text-center">Loading user...</p>;
+  if (!currentUser) {
+    return <div className="text-center py-10">User loading...</div>;
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -65,7 +71,9 @@ const ChatRoom = () => {
           >
             <p
               className={`inline-block p-2 rounded-lg ${
-                msg.sender === currentUser._id ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                msg.sender === currentUser._id
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200'
               }`}
             >
               {msg.content}
