@@ -1,14 +1,14 @@
-import {  useState } from "react";
+import { useContext, useState } from "react";
 import { UserRound, Stethoscope, LogIn, Lock } from "lucide-react";
-import { Link } from "react-router-dom";
-// import API from "../../api/API";
+import { Link, useNavigate } from "react-router-dom";
+import API from "../../api/API";
 import assets from "../../assets/images/assets";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-// import { AppContext } from "../../context/AppContext";
+import { AppContext } from "../../context/AppContext";
 
 const Login = () => {
-  // const { showNotification } = useContext(AppContext);
+  const { showNotification } = useContext(AppContext);
   const [userType, setUserType] = useState("patient");
   const [formData, setFormData] = useState({
     email: "",
@@ -17,7 +17,7 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -32,30 +32,30 @@ const Login = () => {
     setLoading(true);
     setErrorMsg("");
 
-    // try {
-    //   const res = await API.post("/user/login", {
-    //     ...formData,
-    //     role: userType,
-    //   });
+    try {
+      const res = await API.post("/user/login", {
+        ...formData,
+        role: userType,
+      });
 
-    //   // Example: store token/user and navigate
-    //   localStorage.setItem("user", JSON.stringify(res.data));
-    //   showNotification("Login successful!", "success");
+      // Example: store token/user and navigate
+      localStorage.setItem("user", JSON.stringify(res.data));
+      showNotification("Login successful!", "success");
 
-    //   // Redirect based on role
-    //   if (userType === "patient") {
-    //     navigate("/patient-dashboard");
-    //   } else {
-    //     navigate("/doctor-dashboard");
-    //   }
-    // } catch (err) {
-    //   const msg =
-    //     err.response?.data?.message || "Login failed. Please try again.";
-    //   setErrorMsg(msg);
-    //   console.error("Login error:", err);
-    // } finally {
-    //   setLoading(false);
-    // }
+      // Redirect based on role
+      if (userType === "patient") {
+        navigate("/patient-dashboard");
+      } else {
+        navigate("/doctor-dashboard");
+      }
+    } catch (err) {
+      const msg =
+        err.response?.data?.message || "Login failed. Please try again.";
+      setErrorMsg(msg);
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loginParagraph =

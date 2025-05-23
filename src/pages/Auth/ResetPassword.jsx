@@ -1,14 +1,14 @@
-import { useState } from "react";
-// import { useParams } from "react-router-dom";
-// import API from "../../api/API"; // Adjust the import path as needed
+import { useContext, useState } from "react";
+import { useParams } from "react-router-dom";
+import API from "../../api/API"; // Adjust the import path as needed
 import assets from "../../assets/images/assets";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { AppContext } from "../../context/AppContext";
 
 const ResetPassword = () => {
-  // const { showNotification } = useContext(AppContext);
-  // const { token } = useParams();
+  const { showNotification } = useContext(AppContext);
+  const { token } = useParams();
   // const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,28 +21,28 @@ const ResetPassword = () => {
     setMessage("");
     setError("");
 
-    // if (newPassword !== confirmPassword) {
-    //   setError("Passwords do not match.");
-    //   return;
-    // }
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
 
-    // try {
-    //   setLoading(true);
-    //   const response = await API.post(
-    //     `/resetPassword/reset-password/${token}`,
-    //     {
-    //       newPassword,
-    //     }
-    //   );
+    try {
+      setLoading(true);
+      const response = await API.post(
+        `/resetPassword/reset-password/${token}`,
+        {
+          newPassword,
+        }
+      );
 
-    //   setMessage(response.data.message || "Password reset successful.");
-    //   showNotification("Login successful!", "success");
-    // } catch (err) {
-    //   setError(err.response?.data?.error || "Something went wrong.");
-    //   showNotification("Login successful!", "success");
-    // } finally {
-    //   setLoading(false);
-    // }
+      setMessage(response.data.message || "Password reset successful.");
+      showNotification("Login successful!", "success");
+    } catch (err) {
+      setError(err.response?.data?.error || "Something went wrong.");
+      showNotification("Login successful!", "success");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-// import API from "../../api/API"; // Adjust path if needed
+import API from "../../api/API"; // Adjust path if needed
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import assets from "../../assets/images/assets";
@@ -15,17 +15,17 @@ const ForgotPassword = () => {
     setMessage("");
     setError("");
 
-    // try {
-    //   setLoading(true);
-    //   const response = await API.post("/resetPassword/forgot-password", {
-    //     email,
-    //   });
-    //   setMessage(response.data.message || "Reset link sent to your email.");
-    // } catch (err) {
-    //   setError(err.response?.data?.error || "Error sending reset email.");
-    // } finally {
-    //   setLoading(false);
-    // }
+    try {
+      setLoading(true);
+      const response = await API.post("/resetPassword/forgot-password", {
+        email,
+      });
+      setMessage(response.data.message || "Reset link sent to your email.");
+    } catch (err) {
+      setError(err.response?.data?.error || "Error sending reset email.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

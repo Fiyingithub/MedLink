@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { UserRound, Stethoscope, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 // import API from "../../api/axios";
 import assets from "../../assets/images/assets";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-// import { AppContext } from "../../context/AppContext";
-// import API from "../../api/API";
+import { AppContext } from "../../context/AppContext";
+import API from "../../api/API";
 
 const Signup = () => {
-  // const { showNotification } = useContext(AppContext);
+  const { showNotification } = useContext(AppContext);
   const [userType, setUserType] = useState("patient");
   const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({
@@ -43,52 +43,52 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // if (!formData.termsAgreed) {
-    //   alert("You must agree to the terms and conditions.");
-    //   return;
-    // }
+    if (!formData.termsAgreed) {
+      alert("You must agree to the terms and conditions.");
+      return;
+    }
 
-    // try {
-    //   const data = new FormData();
+    try {
+      const data = new FormData();
 
-    //   // Universal required fields
-    //   data.append("role", userType); // backend expects 'role'
-    //   data.append("firstName", formData.firstName);
-    //   data.append("lastName", formData.lastName);
-    //   data.append("email", formData.email);
-    //   data.append("password", formData.password);
-    //   data.append("confirmPassword", formData.confirmPassword);
-    //   data.append("dateOfBirth", formData.dateOfBirth);
+      // Universal required fields
+      data.append("role", userType); // backend expects 'role'
+      data.append("firstName", formData.firstName);
+      data.append("lastName", formData.lastName);
+      data.append("email", formData.email);
+      data.append("password", formData.password);
+      data.append("confirmPassword", formData.confirmPassword);
+      data.append("dateOfBirth", formData.dateOfBirth);
 
-    //   if (userType === "patient") {
-    //     data.append("bloodType", formData.bloodType);
-    //     data.append("allergies", formData.allergies);
-    //   } else if (userType === "doctor") {
-    //     data.append("specialization", formData.specialization);
-    //     data.append("licenseNumber", formData.licenseNumber);
-    //     data.append("yearsOfExperience", formData.yearsOfExperience.toString());
-    //     data.append("hospital", formData.hospital);
-    //   }
+      if (userType === "patient") {
+        data.append("bloodType", formData.bloodType);
+        data.append("allergies", formData.allergies);
+      } else if (userType === "doctor") {
+        data.append("specialization", formData.specialization);
+        data.append("licenseNumber", formData.licenseNumber);
+        data.append("yearsOfExperience", formData.yearsOfExperience.toString());
+        data.append("hospital", formData.hospital);
+      }
 
-    //   if (image) {
-    //     data.append("image", image); // image last
-    //   }
+      if (image) {
+        data.append("image", image); // image last
+      }
 
-    //   const response = await API.post("/user/register", data, {
-    //     headers: { "Content-Type": "multipart/form-data" },
-    //   });
+      const response = await API.post("/user/register", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-    //   if (response.status === 200) {
-    //     showNotification("registration successful!", "success");
-    //     console.log("Server response:", response.data);
-    //     //  navigate('/doctor-dashboard');
-    //   } else {
-    //     alert(response.data.message || "Something went wrong.");
-    //   }
-    // } catch (error) {
-    //   console.error("Signup error:", error);
-    //   alert("Network error. Please try again later.");
-    // }
+      if (response.status === 200) {
+        showNotification("registration successful!", "success");
+        console.log("Server response:", response.data);
+        //  navigate('/doctor-dashboard');
+      } else {
+        alert(response.data.message || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("Network error. Please try again later.");
+    }
   };
 
   return (
