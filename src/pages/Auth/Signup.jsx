@@ -1,11 +1,12 @@
 import { useContext, useState } from "react";
 import { UserRound, Stethoscope, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
-import API from "../../api/axios";
+// import API from "../../api/axios";
 import assets from "../../assets/images/assets";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { AppContext } from "../../context/AppContext";
+import API from "../../api/axios";
 
 const Signup = () => {
   const { showNotification } = useContext(AppContext);
