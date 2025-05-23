@@ -17,7 +17,7 @@ import Tips2Img from './tips2.png'
 import Tips3Img from './tips3.png'
 import LoginImage from './LoginImage.png'
 import SignupImage from './SignupImage.png'
-import PatientSignUpImage from './PatientSignupImage.jpg'
+import PatientSignUpImage from './PatientSignUpImage.jpg'
 
 
 
