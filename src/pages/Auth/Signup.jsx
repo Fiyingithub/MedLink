@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Check, UserRound, Stethoscope, ChevronDown } from "lucide-react";
 import Logo from "../../assets/images/assets";
 import { Link } from "react-router-dom";
-import API from "../../api/axios";
+import API from "../../api/Axios";
+import imageCompression from 'browser-image-compression';
 
 const Signup = () => {
   const [userType, setUserType] = useState("patient");
@@ -35,56 +37,94 @@ const Signup = () => {
     setImage(e.target.files[0]);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const navigate = useNavigate();
 
-    if (!formData.termsAgreed) {
-      alert("You must agree to the terms and conditions.");
-      return;
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const data = new FormData();
+  if (!formData.termsAgreed) {
+    alert("You must agree to the terms and conditions.");
+    return;
+  }
 
-      // Universal required fields
-      data.append("role", userType); // backend expects 'role'
-      data.append("firstName", formData.firstName);
-      data.append("lastName", formData.lastName);
-      data.append("email", formData.email);
-      data.append("password", formData.password);
-      data.append("confirmPassword", formData.confirmPassword);
-      data.append("dateOfBirth", formData.dateOfBirth);
+  const data = new FormData();
+  data.append("role", userType);
+  data.append("firstName", formData.firstName);
+  data.append("lastName", formData.lastName);
+  data.append("email", formData.email);
+  data.append("password", formData.password);
+  data.append("confirmPassword", formData.confirmPassword);
+  data.append("dateOfBirth", formData.dateOfBirth);
 
-      if (userType === "patient") {
-        data.append("bloodType", formData.bloodType);
-        data.append("allergies", formData.allergies);
-      } else if (userType === "doctor") {
-        data.append("specialization", formData.specialization);
-        data.append("licenseNumber", formData.licenseNumber);
-        data.append("yearsOfExperience", formData.yearsOfExperience.toString());
-        data.append("hospital", formData.hospital);
-      }
+  if (userType === "patient") {
+    data.append("bloodType", formData.bloodType);
+    data.append("allergies", formData.allergies);
+  } else {
+    data.append("specialization", formData.specialization);
+    data.append("licenseNumber", formData.licenseNumber);
+    data.append(
+      "yearsOfExperience",
+      String(formData.yearsOfExperience || "0")
+    );
+    data.append("hospital", formData.hospital);
+  }
 
-      if (image) {
-        data.append("image", image); // image last
-      }
-
-      const response = await API.post("/user/register", data, {
-        headers: { "Content-Type": "multipart/form-data" },
+  try {
+    if (image) {
+      const compressedFile = await imageCompression(image, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+        fileType: image.type,
       });
 
-      if (response.status === 200) {
-        alert("Registration successful!");
-        console.log("Server response:", response.data);
-        //  navigate('/doctor-dashboard');
-      } else {
-        alert(response.data.message || "Something went wrong.");
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!allowedTypes.includes(compressedFile.type)) {
+        alert("Only .jpg, .jpeg, .png formats are allowed.");
+        return;
       }
-    } catch (error) {
-      console.error("Signup error:", error);
-      alert("Network error. Please try again later.");
+
+      data.append("image", compressedFile);
     }
-  };
+
+    const response = await API.post("/user/register", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      timeout: 20000,
+    });
+
+    if (response.status === 200) {
+      alert("Registration successful!");
+
+      // ✅ Save token and user info
+      const { token, user } = response.data;
+      if (token) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      // ✅ Redirect based on role
+      if (user.role === "doctor") {
+        navigate("/doctor/dashboard");
+      } else if (user.role === "patient") {
+        navigate("/patient/dashboard");
+      } else {
+        navigate("/login"); // fallback
+      }
+    } else {
+      console.error("Signup failed:", response.data);
+      alert(response.data.message || "Something went wrong.");
+    }
+  } catch (error) {
+    console.error("Signup error:", error);
+    const message =
+      error?.response?.data?.message ||
+      error.message ||
+      "An unexpected error occurred.";
+    alert(`Signup failed: ${message}`);
+  }
+};
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gray-100 overflow-hidden">
