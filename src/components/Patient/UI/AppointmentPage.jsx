@@ -299,8 +299,8 @@ const AppointmentPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 ">
+      <div>
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -368,27 +368,27 @@ const AppointmentPage = () => {
         </div>
 
         {/* Appointments Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden [&::-webkit-scrollbar]:hidden">
-          <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="max-w-full overflow-x-auto [&::-webkit-scrollbar]:hidden">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 lg:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Patient
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 lg:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Doctor
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 lg:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date & Time
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 lg:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Type
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 lg:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 lg:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -397,7 +397,7 @@ const AppointmentPage = () => {
                 {currentAppointments.length > 0 ? (
                   currentAppointments.map((appointment) => (
                     <tr key={appointment.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 lg:px-3 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                             <User className="w-5 h-5 text-blue-600" />
@@ -412,12 +412,12 @@ const AppointmentPage = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 lg:px-3 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           {appointment.doctorName}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 lg:px-3 py-4 whitespace-nowrap">
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-4 h-4 text-gray-400" />
                           <div>
@@ -431,15 +431,15 @@ const AppointmentPage = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 lg:px-3 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
                           {appointment.type}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 lg:px-3 py-4 whitespace-nowrap">
                         {getStatusBadge(appointment.status)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="px-6 lg:px-3 py-4 whitespace-nowrap text-sm font-medium">
                         {appointment.status === "rejected" &&
                           appointment.reason && (
                             <button
@@ -457,7 +457,7 @@ const AppointmentPage = () => {
                   <tr>
                     <td
                       colSpan="6"
-                      className="px-6 py-8 text-center text-gray-500"
+                      className="px-6 lg:px-3 py-8 text-center text-gray-500"
                     >
                       No appointments found matching your criteria.
                     </td>
