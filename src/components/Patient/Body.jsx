@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import assets from "../../assets/images/assets";
 import { useNavigate } from "react-router-dom";
-import "mapbox-gl/dist/mapbox-gl.css";
 // Icons
 
 import { FaFileMedical } from "react-icons/fa6";
@@ -14,7 +13,6 @@ import { TbWaveSawTool } from "react-icons/tb";
 import { GoSidebarExpand } from "react-icons/go";
 import Map, { Marker } from "react-map-gl/mapbox";
 import UpcomingAppointmentCard from "./UI/UpcomingAppointmentCard";
-// import CheckInsurance from "./CheckInsurance";
 
 const Body = () => {
   const navigate = useNavigate();
