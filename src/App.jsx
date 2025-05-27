@@ -15,6 +15,7 @@ import { UserProvider } from './context/UserContext';
 import DoctorDashboard from "./pages/Doctor/DoctorDashboard.jsx";
 import AppointmentPage from "./components/Doctor/Apointment/AppointmentPage.jsx";
 import PatientDashboard from "./pages/Patient/PatientDashboard.jsx";
+import Appointment from "./components/Patient/Appointment/Appointment.jsx";
 
 const App = () => {
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ const App = () => {
 
         {/* Patient Routes */}
         <Route path="/patient-dashboard" element={<PatientDashboard/>} />
+        <Route path="/patient/appointments" element={<Appointment />} />
       </Routes>
     </UserProvider>
   );

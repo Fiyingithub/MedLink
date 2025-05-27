@@ -173,10 +173,10 @@ const TopBar = ({ toggleSidebar }) => {
             <div className="flex items-center">
               <div className="flex flex-col text-[14px]">
                 <p className="font-medium">
-                  {userData?.data?.firstName || "Adegbenga"}
+                  {userData?.data?.firstName || "Portable"}
                 </p>
                 <p className="text-[#4A4C56]">
-                  {userData?.data?.lastName || "Oluwatosin"}
+                  {userData?.data?.lastName || "Zazu"}
                 </p>
               </div>
 
