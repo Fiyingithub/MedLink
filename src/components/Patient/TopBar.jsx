@@ -116,12 +116,12 @@ const TopBar = ({ toggleSidebar }) => {
 
   //   const userToken = sessionStorage.getItem("userToken");
   const userData = JSON.parse(localStorage.getItem("userData"));
-
+  const token = userData?.token
   useEffect(() => {
-    if (!userData.token) {
+    if (!token) {
       navigate("/login");
     }
-  }, [userData.token]);
+  }, [token]);
 
   return (
     <div className="fixed top-0 z-10 bg-white w-full font-lato">
@@ -165,7 +165,7 @@ const TopBar = ({ toggleSidebar }) => {
             <div className="relative mr-3">
               <img
                 className="w-10 h-10 rounded-full object-cover"
-                src={userData?.user?.image ||assets.Doctor3Img}
+                src={userData?.user?.image || assets.Doctor3Img}
                 alt="User Avatar"
               />
               <span className="w-3.5 h-3.5 bg-[#8937CE] rounded-full border-2 border-white absolute bottom-0 right-0"></span>
@@ -173,9 +173,7 @@ const TopBar = ({ toggleSidebar }) => {
 
             <div className="flex items-center">
               <div className="flex flex-col text-[14px]">
-                <p className="font-medium">
-                  {userData?.user?.firstName || ""}
-                </p>
+                <p className="font-medium">{userData?.user?.firstName || ""}</p>
                 <p className="text-[#4A4C56]">
                   {userData?.user?.lastName || ""}
                 </p>
