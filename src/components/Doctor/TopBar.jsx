@@ -115,11 +115,12 @@ const TopBar = ({ toggleSidebar }) => {
 
   //   const userToken = sessionStorage.getItem("userToken");
   const userData = JSON.parse(localStorage.getItem("DoctorData"));
+  const token = userData?.token
   useEffect(() => {
-    if (!userData.token) {
+    if (!token) {
       navigate("/login");
     }
-  }, [userData.token]);
+  }, [token]);
 
   return (
     <div className="fixed top-0 z-10 bg-white w-full font-lato">
