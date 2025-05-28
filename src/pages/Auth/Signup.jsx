@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 import { UserRound, Stethoscope, ChevronDown } from "lucide-react";
-import { Link } from "react-router-dom";
-// import API from "../../api/axios";
+import { Link, useNavigate } from "react-router-dom";
 import assets from "../../assets/images/assets";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -9,8 +8,10 @@ import { AppContext } from "../../context/AppContext";
 import API from "../../api/API";
 
 const Signup = () => {
-  const { showNotification } = useContext(AppContext);
+  const navigate = useNavigate();
+  const { showNotification, showOverlay, hideOverlay } = useContext(AppContext);
   const [userType, setUserType] = useState("patient");
+  const [isLoading, setIsLoading] = useState(false);
   const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -40,19 +41,49 @@ const Signup = () => {
     setImage(e.target.files[0]);
   };
 
+  const isCommonFieldsValid =
+    formData.firstName &&
+    formData.lastName &&
+    formData.email &&
+    formData.password &&
+    formData.confirmPassword &&
+    formData.termsAgreed &&
+    formData.password === formData.confirmPassword;
+
+  let isFormValid = false;
+
+  if (userType === "patient") {
+    isFormValid =
+      isCommonFieldsValid && formData.bloodType && formData.dateOfBirth;
+  } else if (userType === "doctor") {
+    isFormValid =
+      isCommonFieldsValid &&
+      formData.specialization &&
+      formData.licenseNumber &&
+      formData.yearsOfExperience &&
+      formData.hospital;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.termsAgreed) {
-      alert("You must agree to the terms and conditions.");
+      showNotification("You must agree to the terms and conditions.");
       return;
     }
+
+    if (formData.password !== formData.confirmPassword) {
+      showNotification("Passwords do not match.");
+      return;
+    }
+    showOverlay();
+    setIsLoading(true);
 
     try {
       const data = new FormData();
 
       // Universal required fields
-      data.append("role", userType); // backend expects 'role'
+      data.append("role", userType);
       data.append("firstName", formData.firstName);
       data.append("lastName", formData.lastName);
       data.append("email", formData.email);
@@ -71,7 +102,7 @@ const Signup = () => {
       }
 
       if (image) {
-        data.append("image", image); // image last
+        data.append("image", image);
       }
 
       const response = await API.post("/user/register", data, {
@@ -79,21 +110,57 @@ const Signup = () => {
       });
 
       if (response.status === 200) {
-        showNotification("registration successful!", "success");
-        console.log("Server response:", response.data);
-        //  navigate('/doctor-dashboard');
+        showNotification("Registration successful!");
+        // console.log("Server response:", response.data);
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          dateOfBirth: "",
+          bloodType: "",
+          allergies: "",
+          specialization: "",
+          licenseNumber: "",
+          yearsOfExperience: "",
+          hospital: "",
+          termsAgreed: false,
+        });
+        navigate("/login");
       } else {
-        alert(response.data.message || "Something went wrong.");
+        showNotification(response.data.message || "Something went wrong.");
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          dateOfBirth: "",
+          bloodType: "",
+          allergies: "",
+          specialization: "",
+          licenseNumber: "",
+          yearsOfExperience: "",
+          hospital: "",
+          termsAgreed: false,
+        });
+        navigate("/login");
       }
     } catch (error) {
       console.error("Signup error:", error);
-      alert("Network error. Please try again later.");
+      showNotification(
+        error.response?.data?.message ||
+          "Network error. Please try again later."
+      );
+    } finally {
+      hideOverlay();
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="relative w-full bg-blue overflow-hidden font-sans">
-      {/* <div className="absolute inset-0 bg-white bg-opacity-30 z-10 mix-blend-overlay" /> */}
       <Header />
       <main className="relative z-20 flex flex-col justify-center h-full">
         <div className="lg:flex mb-20 lg:mb-0 h-[100%]">
@@ -144,19 +211,26 @@ const Signup = () => {
               {/* Form Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 {[
-                  { label: "First Name", name: "firstName" },
-                  { label: "Last Name", name: "lastName" },
+                  { label: "First Name", name: "firstName", required: true },
+                  { label: "Last Name", name: "lastName", required: true },
                   {
                     label: "Email Address",
                     name: "email",
                     type: "email",
                     colSpan: 2,
+                    required: true,
                   },
-                  { label: "Password", name: "password", type: "password" },
+                  {
+                    label: "Password",
+                    name: "password",
+                    type: "password",
+                    required: true,
+                  },
                   {
                     label: "Confirm Password",
                     name: "confirmPassword",
                     type: "password",
+                    required: true,
                   },
                 ].map((field) => (
                   <div
@@ -164,15 +238,19 @@ const Signup = () => {
                     className={field.colSpan === 2 ? "md:col-span-2" : ""}
                   >
                     <label className="block text-[15px] font-medium text-gray-700 mb-1">
-                      {field.label}
+                      {field.label}{" "}
+                      {field.required && (
+                        <span className="text-red-500">*</span>
+                      )}
                     </label>
                     <input
                       type={field.type || "text"}
                       name={field.name}
                       value={formData[field.name]}
                       onChange={handleChange}
-                      placeholder={`Enter ${field.name}`}
+                      placeholder={`Enter ${field.label}`}
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-[#00418C] focus:outline-none"
+                      required={field.required}
                     />
                   </div>
                 ))}
@@ -195,7 +273,7 @@ const Signup = () => {
                   <>
                     <div>
                       <label className="block text-[15px] font-medium text-gray-700 mb-1">
-                        Date of Birth
+                        Date of Birth <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="date"
@@ -203,12 +281,13 @@ const Signup = () => {
                         value={formData.dateOfBirth}
                         onChange={handleChange}
                         className="w-full p-2 border border-gray-300 rounded-md"
+                        required
                       />
                     </div>
 
                     <div>
                       <label className="block text-[15px] font-medium text-gray-700 mb-1">
-                        Blood Type
+                        Blood Type <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <select
@@ -216,6 +295,7 @@ const Signup = () => {
                           value={formData.bloodType}
                           onChange={handleChange}
                           className="w-full p-2 border border-gray-300 rounded-md appearance-none"
+                          required
                         >
                           <option value="">Select</option>
                           {[
@@ -262,32 +342,42 @@ const Signup = () => {
                       {
                         label: "Medical License Number",
                         name: "licenseNumber",
+                        required: true,
                       },
                       {
                         label: "Years of Experience",
                         name: "yearsOfExperience",
                         type: "number",
+                        required: true,
                       },
-                      { label: "Hospital/Clinic", name: "hospital" },
+                      {
+                        label: "Hospital/Clinic",
+                        name: "hospital",
+                        required: true,
+                      },
                     ].map((field) => (
                       <div key={field.name}>
                         <label className="block text-[15px] font-medium text-gray-700 mb-1">
-                          {field.label}
+                          {field.label}{" "}
+                          {field.required && (
+                            <span className="text-red-500">*</span>
+                          )}
                         </label>
                         <input
                           type={field.type || "text"}
                           name={field.name}
                           value={formData[field.name]}
                           onChange={handleChange}
-                          placeholder={`Enter ${field.name}`}
+                          placeholder={`Enter ${field.label}`}
                           className="w-full p-2 border border-gray-300 rounded-md"
+                          required={field.required}
                         />
                       </div>
                     ))}
 
                     <div>
                       <label className="block text-[15px] font-medium text-gray-700 mb-1">
-                        Specialization
+                        Specialization <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <select
@@ -295,6 +385,7 @@ const Signup = () => {
                           value={formData.specialization}
                           onChange={handleChange}
                           className="w-full p-2 border border-gray-300 rounded-md appearance-none"
+                          required
                         >
                           <option value="">Select</option>
                           {[
@@ -330,6 +421,7 @@ const Signup = () => {
                   checked={formData.termsAgreed}
                   onChange={handleChange}
                   className="h-4 w-4 text-[#00418C] border-gray-300 rounded"
+                  required
                 />
                 <label className="ml-2 text-[16px] text-gray-700">
                   I agree to the{" "}
@@ -339,15 +431,21 @@ const Signup = () => {
                   and{" "}
                   <a href="#" className="text-[#00418C] font-medium underline">
                     Privacy Policy
-                  </a>
+                  </a>{" "}
+                  <span className="text-red-500">*</span>
                 </label>
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-[#00418C] text-white py-3 rounded-md hover:bg-[#00418C]/90 transition"
+                className={`w-full py-3 rounded-md transition text-white ${
+                  !isFormValid
+                    ? "opacity-50 bg-gray-600 cursor-not-allowed"
+                    : "bg-[#00418C] hover:bg-[#00418C]/90"
+                }`}
+                disabled={!isFormValid}
               >
-                Sign Up
+                {isLoading ? "Submitting..." : "Signup"}
               </button>
 
               <div className="text-center text-[18px] mt-4 text-gray-600">

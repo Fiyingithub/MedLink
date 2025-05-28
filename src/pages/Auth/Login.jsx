@@ -27,42 +27,41 @@ const Login = () => {
     }));
   };
 
+  const isFormValid = formData.email && formData.password && formData.rememberMe
+
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setErrorMsg("");
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
 
-  try {
-    const res = await API.post("/user/login", {
-      ...formData,
-      role: userType,
-    });
+    try {
+      const res = await API.post("/user/login", {
+        ...formData,
+        role: userType,
+      });
 
-    // 🔐 Store token and user separately
-    const { token, user } = res.data;
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-      // Example: store token/user and navigate
-      localStorage.setItem("user", JSON.stringify(res.data));
-      showNotification("Login successful!", "success");
+      
+      
 
-    alert("Login successful!");
-
-    // 🚀 Redirect based on role
-    if (userType === "patient") {
-      navigate("/book-appointment");
-    } else {
-      navigate("/doctor-dashboard");
+      // Redirect based on role
+      if (userType === "patient") {
+        showNotification("Login successful!", "success");
+        localStorage.setItem("userData", JSON.stringify(res.data));
+        navigate("/patient-dashboard");
+      } else {
+        showNotification("Login successful!", "success");
+        localStorage.setItem("DoctorData", JSON.stringify(res.data));
+        navigate("/doctor-dashboard");
+      }
+    } catch (err) {
+      const msg =
+        err.response?.data?.message || "Login failed. Please try again.";
+      setErrorMsg(msg);
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    const msg =
-      err.response?.data?.message || "Login failed. Please try again.";
-    setErrorMsg(msg);
-    console.error("Login error:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const loginParagraph =
     userType === "patient"
@@ -205,12 +204,12 @@ const Login = () => {
 
                 <button
                   type="submit"
-                  disabled={loading}
-                  className={`w-full bg-[#00418C] text-white py-3 rounded-md transition cursor-pointer ${
-                    loading
-                      ? "opacity-70 cursor-not-allowed"
-                      : "hover:bg-[#00418C]/90"
+                  className={`w-full py-3 rounded-md transition text-white ${
+                    !isFormValid
+                      ? "opacity-50 bg-gray-600 cursor-not-allowed"
+                      : "bg-[#00418C] hover:bg-[#00418C]/90"
                   }`}
+                  disabled={!isFormValid}
                 >
                   {loading ? "Logging in..." : "Login"}
                 </button>
