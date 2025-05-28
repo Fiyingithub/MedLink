@@ -111,7 +111,7 @@ const TopBar = ({ toggleSidebar }) => {
     sessionStorage.removeItem("userData");
     sessionStorage.removeItem("userToken");
 
-    navigate("/shareholderlogin");
+    navigate("/login");
   };
 
   //   const userToken = sessionStorage.getItem("userToken");
