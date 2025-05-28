@@ -92,7 +92,7 @@ const Body = () => {
     ),
   };
 
-  const userData = JSON.parse(sessionStorage.getItem("userData"));
+  const userData = JSON.parse(localStorage.getItem("DoctorData"));
 
   return (
     <div className="font-lato mb-20">
@@ -100,7 +100,7 @@ const Body = () => {
         {/* Welcome Section */}
         <div className="space-y-1">
           <h1 className="text-2xl md:text-[28px] font-medium text-gray-900">
-            Welcome {userData?.data?.firstName || "Dr. Adegbenga"}
+            Welcome Dr. {userData?.user?.firstName || ""}
           </h1>
           <p className="text-sm md:text-[14px] text-gray-500 leading-relaxed">
             {"Here's"} your profile summary.

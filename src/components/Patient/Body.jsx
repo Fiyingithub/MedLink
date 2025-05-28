@@ -88,7 +88,7 @@ const Body = () => {
   //   )} ${month} ${year}, ${hours}:${minutes} ${period}`;
   // }
 
-  const userData = JSON.parse(sessionStorage.getItem("userData"));
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   return (
     <div className="font-lato mb-20">
@@ -199,7 +199,7 @@ const Body = () => {
                     <div>
                       <div className="w-[100px] h-[100px] rounded-xl overflow-hidden border border-gray-300 shadow-lg ">
                         <img
-                          src={assets.DentistImg}
+                          src={userData?.user.image || assets.DentistImg}
                           alt=""
                           className="h-[100%] w-[100%] object-cover "
                         />
@@ -213,10 +213,10 @@ const Body = () => {
                     </div>
                     <div>
                       <h1 className="font-medium text-[2vmax] ">
-                        Portable Zazu
+                        {userData?.user.firstName} {userData.user.lastName}
                       </h1>
                       <p className="font-medium text-[1.5vmax] ">
-                        #p-patientID
+                        #p-{userData?.user?.role}
                       </p>
                       <p className="flex items-center gap-1 ">
                         <IoMdTime /> {"Joined on 15 October 2024, 10:00 AM"}
