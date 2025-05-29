@@ -12,6 +12,8 @@ import ResetPassword from "./pages/Auth/ResetPassword.jsx";
 import DoctorDashboard from "./pages/DoctorDashboard.jsx";
 import PrivateRoute from "./routes/allRoutes.jsx";
 import ChatRoom from "./pages/ChatRoom.jsx";
+import SearchDoctors from "./pages/SearchDoctors";
+import PatientDashboard from "./components/PatientDashboard.jsx";
 import { UserProvider } from './context/UserContext';
 
 const App = () => {
@@ -37,6 +39,8 @@ const App = () => {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/book-appointment" element={<AppointmentForm />} />
         <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+        <Route path="/search-doctors" element={<PrivateRoute><SearchDoctors /></PrivateRoute>} />
+        <Route path="/patient-dashboard" element={<PrivateRoute><PatientDashboard /></PrivateRoute>} />
         <Route path="/dashboard" element={<PrivateRoute><DoctorDashboard /></PrivateRoute>} />
         <Route path="/chat/:recipientId" element={<PrivateRoute><ChatRoom /></PrivateRoute>} />
       </Routes>

@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-// import API from '../api/API';
 import API from '../api/Axios';
 
-const AppointmentForm = ({ onClose }) => {
+const AppointmentForm = ({ onClose, prefillDoctorId = '' }) => {
   const [symptoms, setSymptoms] = useState('');
   const [preferredDate, setPreferredDate] = useState('');
   const [doctors, setDoctors] = useState([]);
-  const [doctorId, setDoctorId] = useState('');
+  const [doctorId, setDoctorId] = useState(prefillDoctorId);
   const [message, setMessage] = useState('');
   const [loadingDoctors, setLoadingDoctors] = useState(true);
   const [error, setError] = useState('');
@@ -15,7 +14,13 @@ const AppointmentForm = ({ onClose }) => {
     const fetchDoctors = async () => {
       try {
         const res = await API.get('/user/doctors');
-        setDoctors(res.data.doctors || []);
+        const doctorList = res.data.doctors || [];
+        setDoctors(doctorList);
+
+        // If prefillDoctorId is passed and exists in the doctor list, set it
+        if (prefillDoctorId && doctorList.find(doc => doc._id === prefillDoctorId)) {
+          setDoctorId(prefillDoctorId);
+        }
       } catch (err) {
         console.error('Failed to fetch doctors:', err.response?.data || err.message);
         setError('Unable to load doctors.');
@@ -24,7 +29,7 @@ const AppointmentForm = ({ onClose }) => {
       }
     };
     fetchDoctors();
-  }, []);
+  }, [prefillDoctorId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,14 +43,13 @@ const AppointmentForm = ({ onClose }) => {
 
       console.log("Booking success:", response.data);
       setMessage('Appointment booked successfully!');
-
-      // Safe call
-      if (typeof onClose === 'function') {
-        onClose();
-      }
+      setTimeout(() => {
+        setMessage('');
+        if (typeof onClose === 'function') onClose();
+      }, 1500);
     } catch (err) {
       console.error('Booking error:', err.response?.data || err.message);
-      setMessage('Error booking appointment. Please login again or try later.');
+      setMessage('Error booking appointment. Please try again or re-login.');
     }
   };
 
@@ -54,9 +58,7 @@ const AppointmentForm = ({ onClose }) => {
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
         <button
           className="absolute top-2 right-4 text-xl"
-          onClick={() => {
-            if (typeof onClose === 'function') onClose();
-          }}
+          onClick={() => typeof onClose === 'function' && onClose()}
         >
           ×
         </button>
@@ -68,16 +70,16 @@ const AppointmentForm = ({ onClose }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {loadingDoctors ? (
-            <p>Loading doctors...</p>
+            <p className="text-gray-600">Loading doctors...</p>
           ) : (
             <select
               value={doctorId}
-              onChange={e => setDoctorId(e.target.value)}
+              onChange={(e) => setDoctorId(e.target.value)}
               className="w-full border p-2 rounded"
               required
             >
               <option value="">Select Doctor</option>
-              {doctors.map(doc => (
+              {doctors.map((doc) => (
                 <option key={doc._id} value={doc._id}>
                   Dr. {doc.firstName} {doc.lastName} - {doc.specialization}
                 </option>
@@ -92,6 +94,7 @@ const AppointmentForm = ({ onClose }) => {
             className="w-full border p-2 rounded"
             required
           />
+
           <input
             type="date"
             value={preferredDate}
@@ -99,9 +102,10 @@ const AppointmentForm = ({ onClose }) => {
             className="w-full border p-2 rounded"
             required
           />
+
           <button
             type="submit"
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 w-full"
           >
             Submit
           </button>

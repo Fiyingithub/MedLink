@@ -50,7 +50,7 @@ const Login = () => {
 
     // 🚀 Redirect based on role
     if (userType === "patient") {
-      navigate("/book-appointment");
+      navigate("/patient-dashboard");
     } else {
       navigate("/doctor-dashboard");
     }
@@ -59,7 +59,6 @@ const Login = () => {
       err.response?.data?.message || "Login failed. Please try again.";
     setErrorMsg(msg);
     console.error("Login error:", err);
-    console.error("Backend response:", error.response?.data);
   } finally {
     setLoading(false);
   }

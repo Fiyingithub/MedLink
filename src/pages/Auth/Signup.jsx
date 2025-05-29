@@ -1,20 +1,18 @@
-import React,{ useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Check, UserRound, Stethoscope, ChevronDown } from "lucide-react";
-import Logo from "../../assets/images/assets";
-import { Link } from "react-router-dom";
-// import API from "../../api/axios"
 import assets from "../../assets/images/assets";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { AppContext } from "../../context/AppContext";
 import API from "../../api/Axios";
-import imageCompression from 'browser-image-compression';
+import imageCompression from "browser-image-compression";
 
 const Signup = () => {
   const { showNotification } = useContext(AppContext);
   const [userType, setUserType] = useState("patient");
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,6 +29,8 @@ const Signup = () => {
     termsAgreed: false,
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -40,122 +40,120 @@ const Signup = () => {
   };
 
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    if (e.target.files.length > 0) {
+      setImage(e.target.files[0]);
+    }
   };
 
-const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+    if (!formData.termsAgreed) {
+      alert("You must agree to the terms and conditions.");
+      return;
+    }
 
-  if (!formData.termsAgreed) {
-    alert("You must agree to the terms and conditions.");
-    return;
-  }
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
 
-  const data = new FormData();
-  data.append("role", userType);
-  data.append("firstName", formData.firstName);
-  data.append("lastName", formData.lastName);
-  data.append("email", formData.email);
-  data.append("password", formData.password);
-  data.append("confirmPassword", formData.confirmPassword);
-  data.append("dateOfBirth", formData.dateOfBirth);
+    setLoading(true);
 
-  if (userType === "patient") {
-    data.append("bloodType", formData.bloodType);
-    data.append("allergies", formData.allergies);
-  } else {
-    data.append("specialization", formData.specialization);
-    data.append("licenseNumber", formData.licenseNumber);
-    data.append(
-      "yearsOfExperience",
-      String(formData.yearsOfExperience || "0")
-    );
-    data.append("hospital", formData.hospital);
-  }
+    const data = new FormData();
+    data.append("role", userType); // backend expects 'role'
+    data.append("firstName", formData.firstName.trim());
+    data.append("lastName", formData.lastName.trim());
+    data.append("email", formData.email.trim());
+    data.append("password", formData.password);
+    data.append("confirmPassword", formData.confirmPassword);
 
-  try {
-    if (image) {
-      const compressedFile = await imageCompression(image, {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 800,
-        useWebWorker: true,
-        fileType: image.type,
+    if (userType === "patient") {
+      data.append("dateOfBirth", formData.dateOfBirth);
+      data.append("bloodType", formData.bloodType);
+      data.append("allergies", formData.allergies);
+    } else if (userType === "doctor") {
+      data.append("specialization", formData.specialization);
+      data.append("licenseNumber", formData.licenseNumber);
+      data.append("yearsOfExperience", formData.yearsOfExperience || "0");
+      data.append("hospital", formData.hospital);
+    }
+
+    try {
+      if (image) {
+        const compressedFile = await imageCompression(image, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 800,
+          useWebWorker: true,
+          fileType: image.type,
+        });
+
+        const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+        if (!allowedTypes.includes(compressedFile.type)) {
+          alert("Only .jpg, .jpeg, .png formats are allowed.");
+          setLoading(false);
+          return;
+        }
+
+        data.append("image", compressedFile, compressedFile.name);
+      }
+
+      const response = await API.post("/user/register", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+        timeout: 20000,
       });
 
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
-      if (!allowedTypes.includes(compressedFile.type)) {
-        alert("Only .jpg, .jpeg, .png formats are allowed.");
-        return;
-      }
+      if (response.status === 201 || response.status === 200) {
+        showNotification("Registration successful!", "success");
 
-      data.append("image", compressedFile);
-    }
+        const { token, user } = response.data;
 
-    const response = await API.post("/user/register", data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      timeout: 20000,
-    });
+        if (token) {
+          localStorage.setItem("token", token);
+          localStorage.setItem("user", JSON.stringify(user));
+        }
 
-      if (response.status === 200) {
-        showNotification("registration successful!", "success");
-        console.log("Server response:", response.data);
-        //  navigate('/doctor-dashboard');
-    if (response.status === 200) {
-      alert("Registration successful!");
-
-      // ✅ Save token and user info
-      const { token, user } = response.data;
-      if (token) {
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(user));
-      }
-
-      // ✅ Redirect based on role
-      if (user.role === "doctor") {
-        navigate("/doctor/dashboard");
-      } else if (user.role === "patient") {
-        navigate("/patient/dashboard");
+        if (user.role === "doctor") {
+          navigate("/doctor-dashboard");
+        } else if (user.role === "patient") {
+          navigate("/patient-dashboard");
+        } else {
+          navigate("/login");
+        }
       } else {
-        navigate("/login"); // fallback
+        alert(response.data.message || "Something went wrong during signup.");
       }
-    } else {
-      console.error("Signup failed:", response.data);
-      alert(response.data.message || "Something went wrong.");
+    } catch (error) {
+      console.error("Signup error:", error);
+      const message =
+        error?.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
+      alert(`Signup failed: ${message}`);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Signup error:", error);
-    const message =
-      error?.response?.data?.message ||
-      error.message ||
-      "An unexpected error occurred.";
-    alert(`Signup failed: ${message}`);
-  }
-};
+  };
 
   return (
-    <div className="relative w-full bg-blue overflow-hidden font-sans">
-      {/* <div className="absolute inset-0 bg-white bg-opacity-30 z-10 mix-blend-overlay" /> */}
+    <div className="relative w-full bg-blue overflow-hidden font-sans min-h-screen flex flex-col">
       <Header />
-      <main className="relative z-20 flex flex-col justify-center h-full">
-        <div className="lg:flex mb-20 lg:mb-0 h-[100%]">
-          <div className="hidden lg:block lg:w-[50%]">
+      <main className="relative z-20 flex flex-col justify-center flex-grow">
+        <div className="lg:flex mb-20 lg:mb-0 h-full">
+          <div className="hidden lg:block lg:w-1/2">
             <img
               src={
                 userType === "patient"
                   ? assets.PatientSignUpImage
                   : assets.SignupImage
               }
-              alt="Doctors"
-              className="w-full h-full object-cover transition-all duration-500 ease-in-out transform "
+              alt="Sign Up"
+              className="w-full h-full object-cover transition-all duration-500 ease-in-out transform"
               loading="lazy"
             />
           </div>
-          {/* Content */}
-          <div className="w-full lg:w-[50%] bg-white p-4 lg:px-20 ">
+
+          <div className="w-full lg:w-1/2 bg-white p-4 lg:px-20">
             <form onSubmit={handleSubmit}>
               <h1 className="text-2xl font-bold text-center mb-8 text-[#00418C]">
                 Create a MedLink Account
@@ -167,8 +165,8 @@ const handleSubmit = async (e) => {
                   {["patient", "doctor"].map((type) => (
                     <button
                       key={type}
-                      onClick={() => setUserType(type)}
                       type="button"
+                      onClick={() => setUserType(type)}
                       className={`flex items-center gap-2 px-6 py-3 ${
                         userType === type
                           ? "bg-[#00418C] text-white"
@@ -186,23 +184,14 @@ const handleSubmit = async (e) => {
                 </div>
               </div>
 
-              {/* Form Fields */}
+              {/* Common Form Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 {[
                   { label: "First Name", name: "firstName" },
                   { label: "Last Name", name: "lastName" },
-                  {
-                    label: "Email Address",
-                    name: "email",
-                    type: "email",
-                    colSpan: 2,
-                  },
+                  { label: "Email Address", name: "email", type: "email", colSpan: 2 },
                   { label: "Password", name: "password", type: "password" },
-                  {
-                    label: "Confirm Password",
-                    name: "confirmPassword",
-                    type: "password",
-                  },
+                  { label: "Confirm Password", name: "confirmPassword", type: "password" },
                 ].map((field) => (
                   <div
                     key={field.name}
@@ -216,26 +205,28 @@ const handleSubmit = async (e) => {
                       name={field.name}
                       value={formData[field.name]}
                       onChange={handleChange}
-                      placeholder={`Enter ${field.name}`}
+                      placeholder={`Enter ${field.label}`}
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-[#00418C] focus:outline-none"
+                      required
+                      autoComplete={field.name === "email" ? "email" : "off"}
                     />
                   </div>
                 ))}
 
-                {/* Image Upload */}
+                {/* Profile Image Upload */}
                 <div className="md:col-span-2">
                   <label className="block text-[15px] font-medium text-gray-700 mb-1">
                     Upload Profile Image
                   </label>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/jpg,image/png"
                     onChange={handleImageChange}
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
 
-                {/* Patient Specific */}
+                {/* Patient Specific Fields */}
                 {userType === "patient" && (
                   <>
                     <div>
@@ -248,6 +239,7 @@ const handleSubmit = async (e) => {
                         value={formData.dateOfBirth}
                         onChange={handleChange}
                         className="w-full p-2 border border-gray-300 rounded-md"
+                        required
                       />
                     </div>
 
@@ -260,9 +252,10 @@ const handleSubmit = async (e) => {
                           name="bloodType"
                           value={formData.bloodType}
                           onChange={handleChange}
-                          className="w-full p-2 border border-gray-300 rounded-md appearance-none"
+                          required
+                          className="w-full p-2 border border-gray-300 rounded-md appearance-none focus:ring focus:ring-[#00418C]"
                         >
-                          <option value="">Select</option>
+                          <option value="">Select Blood Type</option>
                           {[
                             "A+",
                             "A-",
@@ -279,131 +272,132 @@ const handleSubmit = async (e) => {
                           ))}
                         </select>
                         <ChevronDown
-                          className="absolute right-3 top-3 text-gray-500"
-                          size={16}
+                          size={20}
+                          className="absolute top-1/2 right-3 -translate-y-1/2 pointer-events-none text-gray-500"
                         />
                       </div>
                     </div>
 
                     <div className="md:col-span-2">
                       <label className="block text-[15px] font-medium text-gray-700 mb-1">
-                        Allergies (if any)
+                        Allergies (optional)
                       </label>
-                      <textarea
+                      <input
+                        type="text"
                         name="allergies"
                         value={formData.allergies}
                         onChange={handleChange}
-                        className="w-full p-2 h-20 border border-gray-300 resize-none rounded-md"
-                        placeholder="List any allergies you have..."
+                        placeholder="List any allergies"
+                        className="w-full p-2 border border-gray-300 rounded-md"
                       />
                     </div>
                   </>
                 )}
 
-                {/* Doctor Specific */}
+                {/* Doctor Specific Fields */}
                 {userType === "doctor" && (
                   <>
-                    {[
-                      {
-                        label: "Medical License Number",
-                        name: "licenseNumber",
-                      },
-                      {
-                        label: "Years of Experience",
-                        name: "yearsOfExperience",
-                        type: "number",
-                      },
-                      { label: "Hospital/Clinic", name: "hospital" },
-                    ].map((field) => (
-                      <div key={field.name}>
-                        <label className="block text-[15px] font-medium text-gray-700 mb-1">
-                          {field.label}
-                        </label>
-                        <input
-                          type={field.type || "text"}
-                          name={field.name}
-                          value={formData[field.name]}
-                          onChange={handleChange}
-                          placeholder={`Enter ${field.name}`}
-                          className="w-full p-2 border border-gray-300 rounded-md"
-                        />
-                      </div>
-                    ))}
-
                     <div>
                       <label className="block text-[15px] font-medium text-gray-700 mb-1">
                         Specialization
                       </label>
-                      <div className="relative">
-                        <select
-                          name="specialization"
-                          value={formData.specialization}
-                          onChange={handleChange}
-                          className="w-full p-2 border border-gray-300 rounded-md appearance-none"
-                        >
-                          <option value="">Select</option>
-                          {[
-                            "Cardiology",
-                            "Dermatology",
-                            "Neurology",
-                            "Orthopedics",
-                            "Pediatrics",
-                            "Psychiatry",
-                            "Oncology",
-                            "General Practice",
-                          ].map((spec) => (
-                            <option key={spec} value={spec}>
-                              {spec}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown
-                          className="absolute right-3 top-3 text-gray-500"
-                          size={16}
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        name="specialization"
+                        value={formData.specialization}
+                        onChange={handleChange}
+                        placeholder="Your specialization"
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[15px] font-medium text-gray-700 mb-1">
+                        License Number
+                      </label>
+                      <input
+                        type="text"
+                        name="licenseNumber"
+                        value={formData.licenseNumber}
+                        onChange={handleChange}
+                        placeholder="Your license number"
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[15px] font-medium text-gray-700 mb-1">
+                        Years of Experience
+                      </label>
+                      <input
+                        type="number"
+                        name="yearsOfExperience"
+                        value={formData.yearsOfExperience}
+                        onChange={handleChange}
+                        placeholder="Years of experience"
+                        min={0}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[15px] font-medium text-gray-700 mb-1">
+                        Hospital
+                      </label>
+                      <input
+                        type="text"
+                        name="hospital"
+                        value={formData.hospital}
+                        onChange={handleChange}
+                        placeholder="Your hospital"
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
                     </div>
                   </>
                 )}
               </div>
 
-              {/* Terms */}
-              <div className="flex items-center mb-6">
+              {/* Terms & Conditions */}
+              <div className="mb-6 flex items-center gap-2">
                 <input
                   type="checkbox"
                   name="termsAgreed"
+                  id="termsAgreed"
                   checked={formData.termsAgreed}
                   onChange={handleChange}
-                  className="h-4 w-4 text-[#00418C] border-gray-300 rounded"
+                  required
                 />
-                <label className="ml-2 text-[16px] text-gray-700">
+                <label htmlFor="termsAgreed" className="text-sm text-gray-600">
                   I agree to the{" "}
-                  <a href="#" className="text-[#00418C] font-medium underline">
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a href="#" className="text-[#00418C] font-medium underline">
-                    Privacy Policy
-                  </a>
+                  <Link
+                    to="/terms-and-conditions"
+                    className="text-[#00418C] underline"
+                  >
+                    Terms and Conditions
+                  </Link>
                 </label>
               </div>
 
+              {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-[#00418C] text-white py-3 rounded-md hover:bg-[#00418C]/90 transition"
+                disabled={loading}
+                className={`w-full py-3 text-white font-semibold rounded-md ${
+                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#00418C]"
+                }`}
               >
-                Sign Up
+                {loading ? "Signing Up..." : "Sign Up"}
               </button>
 
-              <div className="text-center text-[18px] mt-4 text-gray-600">
+              <p className="mt-6 text-center text-sm text-gray-600">
                 Already have an account?{" "}
-                <Link
-                  to={"/login"}
-                  className="text-[#00418C] font-medium hover:underline"
-                >
-                  Login
+                <Link to="/login" className="text-[#00418C] underline">
+                  Log In
                 </Link>
-              </div>
+              </p>
             </form>
           </div>
         </div>
