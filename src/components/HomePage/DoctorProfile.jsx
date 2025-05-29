@@ -163,12 +163,21 @@ const DoctorProfile = () => {
   const { doctorId } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('description');
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   const doctor = doctors[parseInt(doctorId, 10) ];
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const handleBookAppointment = ()=> {
+    if(!userData){
+      navigate('/login')
+    }else{
+      navigate('/patient-dashboard')
+    }
+  }
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -290,7 +299,9 @@ const DoctorProfile = () => {
 
               {/* Action Buttons */}
               <div className="flex items-center justify-between mt-8 pt-6 ">
-                <button className="bg-blue-800 text-white px-8 py-3 rounded-lg hover:bg-blue-900 transition-colors font-semibold">
+                <button 
+                onClick={handleBookAppointment}
+                className="bg-blue-800 text-white px-8 py-3 rounded-lg hover:bg-blue-900 transition-colors font-semibold">
                   Book Appointment
                 </button>
                 <button
