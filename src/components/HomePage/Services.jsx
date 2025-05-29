@@ -17,7 +17,7 @@ const services = [
     title: "Cardiology",
     description: "Proper check up on your heart is rest assured with MedLink.",
     icon: <FaHeartbeat className="text-2xl text-[#000000]" />,
-    image: assets.DentistImg,
+    image: assets.CardiologyImg,
     link: "#",
   },
   {
@@ -25,7 +25,7 @@ const services = [
     description:
       "Get the best doctor that will take care of your tooth and delivers medications.",
     icon: <FaTooth className="text-2xl text-[#000000]" />,
-    image: assets.CardiologyImg,
+    image: assets.DentistImg,
     link: "#",
   },
   {

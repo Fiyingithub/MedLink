@@ -17,6 +17,8 @@ import AppointmentPage from "./components/Doctor/Apointment/AppointmentPage.jsx"
 import PatientDashboard from "./pages/Patient/PatientDashboard.jsx";
 import Appointment from "./components/Patient/Appointment/Appointment.jsx";
 
+import DoctorProfile from "./components/HomePage/DoctorProfile.jsx";
+
 const App = () => {
   const navigate = useNavigate();
 
@@ -47,7 +49,7 @@ const App = () => {
         <Route path="/doctor/appointments" element={<AppointmentPage />} />
         <Route path="/dashboard" element={<PrivateRoute><DoctorDashboard /></PrivateRoute>} />
         <Route path="/chat/:recipientId" element={<PrivateRoute><ChatRoom /></PrivateRoute>} />
-
+        <Route path="/doctor/:doctorId" element={<DoctorProfile />} />
         {/* Patient Routes */}
         <Route path="/patient-dashboard" element={<PatientDashboard/>} />
         <Route path="/patient/appointments" element={<Appointment />} />
