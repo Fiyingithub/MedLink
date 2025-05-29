@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import API from '../api/API';
+import API from '../api/Axios';
 // import API from '../api/Axios';
 
 const DoctorDashboard = () => {

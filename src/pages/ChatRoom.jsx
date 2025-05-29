@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-// import API from '../api/Axios';
+import API from '../api/Axios';
 import { io } from 'socket.io-client';
 import { useUser } from '../context/UserContext';
-import API from '../api/API';
 
-const socket = io('http://localhost:5000'); // 🔁 Update to deployed URL if needed
+const socket = io('https://techy-xll0.onrender.com'); // 🔁 Update to deployed URL if needed
 
 const ChatRoom = () => {
   const { currentUser } = useUser();

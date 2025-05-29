@@ -1,5 +1,5 @@
 import { useState } from "react";
-import API from "../../api/API"; // Adjust path if needed
+import API from "../../api/Axios"; // Adjust path if needed
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import assets from "../../assets/images/assets";

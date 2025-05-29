@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { useParams } from "react-router-dom";
-import API from "../../api/API"; // Adjust the import path as needed
+import API from "../../api/Axios"; // Adjust the import path as needed
 import assets from "../../assets/images/assets";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";

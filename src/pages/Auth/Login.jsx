@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { UserRound, Stethoscope, LogIn, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import API from "../../api/API";
+import API from "../../api/Axios";
 import assets from "../../assets/images/assets";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -59,6 +59,7 @@ const Login = () => {
       err.response?.data?.message || "Login failed. Please try again.";
     setErrorMsg(msg);
     console.error("Login error:", err);
+    console.error("Backend response:", error.response?.data);
   } finally {
     setLoading(false);
   }
