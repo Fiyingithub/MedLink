@@ -44,7 +44,7 @@ const Doctors = () => (
     </p>
     <div className="grid sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto">
       {doctors.map((doc, index) => (
-        <DoctorCard key={index} {...doc} />
+        <DoctorCard key={index} {...doc} doctorId={index}/>
       ))}
     </div>
   </section>
