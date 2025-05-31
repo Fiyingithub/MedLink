@@ -35,7 +35,7 @@ const doctors = [
 ];
 
 const Doctors = () => (
-  <section className="bg-white py-12 px-4 text-center">
+  <section className="bg-white py-12 px-4 text-center" id="doctor">
     <h2 className="text-3xl font-bold mb-2">
       Meet Our Expert <span className="text-blue-700">Doctors</span>
     </h2>
