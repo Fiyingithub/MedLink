@@ -22,12 +22,18 @@ const Hero = () => {
           explore expert health advice.
         </p>
         <div className="mt-8 flex flex-wrap gap-6 justify-center">
-          <button className="bg-[#B4190B] text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-red-800">
+          <a
+            href="#doctor"
+            className="bg-[#B4190B] cursor-pointer text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-red-800"
+          >
             Book Appointment
-          </button>
-          <button className="border-2 border-[#B4190B] text-[#B4190B] px-8 py-4 rounded-full text-xl font-semibold hover:bg-red-700 hover:text-white transition">
+          </a>
+          <a
+            href="#health"
+            className="border-2 border-[#B4190B] text-[#B4190B] px-8 py-4 rounded-full text-xl font-semibold hover:bg-red-700 hover:text-white transition"
+          >
             Explore Health Tips
-          </button>
+          </a>
         </div>
       </div>
     </section>

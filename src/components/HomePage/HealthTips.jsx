@@ -27,7 +27,7 @@ const tips = [
 
 const HealthTips = () => {
   return (
-    <section className="py-12 px-4 bg-white">
+    <section className="py-12 px-4 bg-white" id="health">
       <div className="flex justify-between items-center mb-6 max-w-6xl mx-auto">
         <h2 className="text-xl font-bold">Latest Healthcare Tips</h2>
         <a href="#" className="text-blue-800 font-medium hover:underline">
